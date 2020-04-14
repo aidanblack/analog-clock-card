@@ -8,7 +8,7 @@ This is my first attempt at a custom card for the Home Assistant Lovelace UI. Ap
 Please feel free to implement any ideas or suggestions and issue a pull request. I can not guarantee that I will respond immediately, but I will consider all suggestions.
 ## Installation
 1. Copy the `analog-clock-card.js` file to your `config/www` folder
-2. Add a resource to your Lovelace configuration: `/local/analog-clock-card.js` (optionally add a 'version' number to force the card to reload after an update)
+2. Add a resource to your Lovelace configuration: `/local/analog-clock-card.js` (optionally increment a 'version' number to force the card to reload after an update)
 
 ![Screenshot of the Lovelace Resources configuration page](LovelaceResource.png "Lovelace Configuration")
 
