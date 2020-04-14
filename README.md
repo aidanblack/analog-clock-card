@@ -9,7 +9,7 @@ Please feel free to implement any ideas or suggestions and issue a pull request.
 1. Copy the `analog-clock-card.js` file to your `config/www` folder
 2. Add a resource to your Lovelace configuration:
 
-![Screenshot of the Lovelace Resources configuration page](LovelaceResource.jpg "Lovelace Configuration")
+![Screenshot of the Lovelace Resources configuration page](LovelaceResource.png "Lovelace Configuration")
 
 3. Add a new card to your Lovelace UI:
 
