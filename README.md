@@ -39,9 +39,9 @@ Currently the clock uses colors from your theme:
 #### iOS Dark theme plus background image
 ![Screenshot of the clock with iOS Dark theme and background image](clock4.png "iOS Dark Theme plus background image")
 
-[commits-shield]: https://img.shields.io/github/commit-activity/y/analog-clock-card.svg?style=for-the-badge
-[commits]: https://github.com/analog-clock-card/commits/master
-[license-shield]: https://img.shields.io/github/license/analog-clock-card.svg?style=for-the-badge
+[commits-shield]: https://img.shields.io/github/commit-activity/y/aidanblack/analog-clock-card.svg?style=for-the-badge
+[commits]: https://github.com/aidanblack/analog-clock-card/commits/master
+[license-shield]: https://img.shields.io/github/license/aidanblack/analog-clock-card.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2020.svg?style=for-the-badge
-[releases-shield]: https://img.shields.io/github/release/analog-clock-card.svg?style=for-the-badge
-[releases]: https://github.com/analog-clock-card/releases
+[releases-shield]: https://img.shields.io/github/release/aidanblack/analog-clock-card.svg?style=for-the-badge
+[releases]: https://github.com/aidanblack/analog-clock-card/releases
