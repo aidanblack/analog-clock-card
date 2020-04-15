@@ -2,13 +2,13 @@
 Home Assistant Lovelace Analog Clock Card
 
 [![GitHub Release][releases-shield]][releases]
-[![License][license-shield]](LICENSE)
-<!-- [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+[![License][license-shield]](https://github.com/aidanblack/analog-clock-card/raw/master/LICENSE)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
 
 ![Project Maintenance][maintenance-shield]
 [![GitHub Activity][commits-shield]][commits]
- -->
-#### A simple SVG analog clock for Home Assistant
+
+### A simple SVG analog clock for Home Assistant
 ![Screenshot of the clock with Default theme](https://github.com/aidanblack/analog-clock-card/raw/master/clock1.png "Default Theme")
 ## Introduction
 This is my first attempt at a custom card for the Home Assistant Lovelace UI. Apologies in advance if my implementation is imperfect or incomplete! It is a simple analog clock that uses SVG. The clock face uses roman numerals, since these are easier to rotate than standard numbers. The date is currently hard-coded with English abbreviations for the month.
