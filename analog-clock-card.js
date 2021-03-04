@@ -30,8 +30,8 @@ class AnalogClockCard extends HTMLElement {
         const card = document.createElement('ha-card');
         card.header = '';
         this.content = document.createElement('div');
-        this.content.style.padding = '0 16px 16px';
-        this.content.style.height = '250px';
+//        this.content.style.padding = '0 16px 16px';
+//        this.content.style.height = '250px';
         card.appendChild(this.content);
         this.appendChild(card);
       }
