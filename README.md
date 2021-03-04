@@ -5,9 +5,6 @@ Home Assistant Lovelace Analog Clock Card
 [![License][license-shield]](https://github.com/aidanblack/analog-clock-card/raw/master/LICENSE)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
 
-![Project Maintenance][maintenance-shield]
-[![GitHub Activity][commits-shield]][commits]
-
 ### A simple SVG analog clock for Home Assistant
 ![Screenshot of the clock with Default theme](https://github.com/aidanblack/analog-clock-card/raw/master/clock1.png "Default Theme")
 ## Introduction
