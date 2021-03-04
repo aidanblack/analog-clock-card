@@ -41,12 +41,12 @@ class AnalogClockCard extends HTMLElement {
       const stateStr = state ? state.state : 'unavailable';
  */  
 
-      var Months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
       var Now = new Date(Date.now());
       var Seconds = Now.getSeconds();
       var Minutes = Now.getMinutes() + Seconds / 60;
       var Hours = Now.getHours() + Minutes / 60;
-      var DateText = Months[Now.getMonth()] + " " + Now.getDate();
+      var options = { month: 'short' };
+      var DateText = Now.toLocaleDateString(undefined, options) + " " + Now.getDate();
 
       this.content.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" id="clock" style="position: relative;max-height: 100%;max-width: 100%;left: 0%;top: 0%;">
