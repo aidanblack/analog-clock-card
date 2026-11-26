@@ -24,31 +24,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+/*
+Modified: fixed the second hand occasionally jumping backwards.
+
+Cause: every `set hass()` call (Home Assistant calls it on every state change)
+rebuilt the whole SVG from scratch. The new SVG restarted its SMIL animations
+and the hands were placed with whole seconds only (getSeconds() has no
+milliseconds), so each rebuild snapped the second hand back by up to one
+second and then it caught up again.
+
+Fix: the SVG is built once and the hands are driven by requestAnimationFrame
+from the real time, including milliseconds. Hass updates no longer touch the
+DOM, and the clock re-syncs itself after the tab was in the background.
+*/
+
 class AnalogClockCard extends HTMLElement {
-    set hass(hass) {
-      if (!this.content) {
-        const card = document.createElement('ha-card');
-        card.header = '';
-        this.content = document.createElement('div');
-//        this.content.style.padding = '0 16px 16px';
-//        this.content.style.height = '250px';
-        card.appendChild(this.content);
-        this.appendChild(card);
-      }
-  
-/*       const entityId = this.config.entity;
-      const state = hass.states[entityId];
-      const stateStr = state ? state.state : 'unavailable';
- */  
+  set hass(hass) {
+    this._hass = hass;
+    this._build();
+  }
 
-      var Now = new Date(Date.now());
-      var Seconds = Now.getSeconds();
-      var Minutes = Now.getMinutes() + Seconds / 60;
-      var Hours = Now.getHours() + Minutes / 60;
-      var options = { month: 'short' };
-      var DateText = Now.toLocaleDateString(undefined, options) + " " + Now.getDate();
+  setConfig(config) {
+    this.config = config;
+  }
 
-      this.content.innerHTML = `
+  // The height of your card. Home Assistant uses this to automatically
+  // distribute all cards over the available columns.
+  getCardSize() {
+    return 1;
+  }
+
+  connectedCallback() {
+    this._build();
+    this._start();
+  }
+
+  disconnectedCallback() {
+    this._stop();
+  }
+
+  _build() {
+    if (this.content) return;
+
+    const card = document.createElement('ha-card');
+    card.header = '';
+    this.content = document.createElement('div');
+    card.appendChild(this.content);
+    this.appendChild(card);
+
+    this.content.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" id="clock" style="position: relative;max-height: 100%;max-width: 100%;left: 0%;top: 0%;">
 
         <!--circle cx="100" cy="100" r="90" fill="#282828" fill-opacity="0.6" /-->
@@ -68,7 +92,7 @@ class AnalogClockCard extends HTMLElement {
             <text transform="rotate(300,100,100)" x="96" y="42">X</text>
             <text transform="rotate(330,100,100)" x="94.5" y="42">XI</text>
         </g>
-        <text id="dateBox" x="135" y="103" font-size="x-small" font-family="'Century Gothic', sans-serif" fill="var(--primary-text-color)">${DateText}</text>
+        <text id="dateBox" x="135" y="103" font-size="x-small" font-family="'Century Gothic', sans-serif" fill="var(--primary-text-color)"></text>
     
         <g style="stroke-width:2;stroke:var(--primary-text-color)">
             <line x1="100" y1="20.5" x2="100" y2="26.5" />
@@ -172,19 +196,16 @@ class AnalogClockCard extends HTMLElement {
     
         <g>
             <g transform="translate(100,100)">
-            <g id="hours" transform="rotate(${Hours * 30})">
+            <g id="hours" transform="rotate(0)">
                 <line x1="0" y1="0" x2="0" y2="-40" stroke="var(--secondary-text-color)" stroke-width="4" stroke-opacity="0.7">
-                <animateTransform attributeName="transform" type="rotate" dur="43200s" values="0;360" repeatCount="indefinite" />
                 </line>
             </g>
-            <g id="minutes" transform="rotate(${Minutes * 6})">
+            <g id="minutes" transform="rotate(0)">
                 <line x1="0" y1="0" x2="0" y2="-60" stroke="var(--secondary-text-color)" stroke-width="2" stroke-opacity="0.7">
-                <animateTransform attributeName="transform" type="rotate" dur="3600s" values="0;360" repeatCount="indefinite" />
                 </line>
             </g>
-            <g id="seconds" transform="rotate(${Seconds * 6})">
+            <g id="seconds" transform="rotate(0)">
                 <line x1="0" y1="0" x2="0" y2="-70" stroke="var(--accent-color)" stroke-width="1" stroke-opacity="0.7">
-                <animateTransform attributeName="transform" type="rotate" dur="60s" values="0;360" repeatDur="indefinite" />
                 </line>
             </g>
             </g>
@@ -193,21 +214,59 @@ class AnalogClockCard extends HTMLElement {
         <circle cx="100" cy="100" r="3" style="fill:var(--secondary-text-color); stroke:var(--secondary-text-color)" />
     
         </svg>
-        `;
-    }
-  
-     setConfig(config) {
-/*       if (!config.entity) {
-        throw new Error('You need to define an entity');
-      }
- */      this.config = config;
-    }
+    `;
 
- // The height of your card. Home Assistant uses this to automatically
-    // distribute all cards over the available columns.
-    getCardSize() {
-      return 1;
+    this._hoursEl = this.content.querySelector('#hours');
+    this._minutesEl = this.content.querySelector('#minutes');
+    this._secondsEl = this.content.querySelector('#seconds');
+    this._dateEl = this.content.querySelector('#dateBox');
+    this._last = {};
+
+    this._update();
+    this._start();
+  }
+
+  _start() {
+    if (this._raf || !this.content || !this.isConnected) return;
+    const loop = () => {
+      this._update();
+      this._raf = requestAnimationFrame(loop);
+    };
+    this._raf = requestAnimationFrame(loop);
+  }
+
+  _stop() {
+    if (this._raf) {
+      cancelAnimationFrame(this._raf);
+      this._raf = null;
     }
   }
-  
-  customElements.define('analog-clock-card', AnalogClockCard);
+
+  _rotate(key, el, degrees) {
+    const value = `rotate(${degrees.toFixed(2)})`;
+    if (this._last[key] !== value) {
+      this._last[key] = value;
+      el.setAttribute('transform', value);
+    }
+  }
+
+  _update() {
+    const now = new Date();
+    const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
+    const minutes = now.getMinutes() + seconds / 60;
+    const hours = (now.getHours() % 12) + minutes / 60;
+
+    this._rotate('h', this._hoursEl, hours * 30);
+    this._rotate('m', this._minutesEl, minutes * 6);
+    this._rotate('s', this._secondsEl, seconds * 6);
+
+    const dayKey = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+    if (this._last.day !== dayKey) {
+      this._last.day = dayKey;
+      this._dateEl.textContent =
+        now.toLocaleDateString(undefined, { month: 'short' }) + ' ' + now.getDate();
+    }
+  }
+}
+
+customElements.define('analog-clock-card', AnalogClockCard);
